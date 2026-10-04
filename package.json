@@ -1,0 +1,34 @@
+{
+  "name": "opencode-openspec-tasks",
+  "version": "0.0.0",
+  "description": "OpenCode TUI sidebar that mirrors the active OpenSpec change: artifact status and live tasks.md progress, styled like the built-in Todo list",
+  "type": "module",
+  "license": "MIT",
+  "exports": {
+    "./tui": "./src/tui.tsx"
+  },
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@effect/platform-node": "4.0.0",
+    "effect": "4.0.0"
+  },
+  "peerDependencies": {
+    "@opencode-ai/plugin": "1.18.33",
+    "@opentui/core": "0.4.5",
+    "@opentui/solid": "0.4.5",
+    "solid-js": "1.9.10"
+  },
+  "devDependencies": {
+    "@effect/vitest": "4.0.0",
+    "@types/node": "22",
+    "typescript": "6.0.3",
+    "vitest": "5.0.3"
+  }
+}
