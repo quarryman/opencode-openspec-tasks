@@ -16,12 +16,20 @@ export interface Progress {
   readonly total: number
 }
 
-/** One line under the tasks row: a section heading or a task. */
-export type TaskItem = Data.TaggedEnum<{
-  Section: { readonly title: string; readonly progress: Progress }
-  Task: { readonly label: string; readonly mark: Mark; readonly depth: number }
-}>
-export const TaskItem = Data.taggedEnum<TaskItem>()
+export interface TaskLine {
+  readonly label: string
+  readonly mark: Mark
+  readonly depth: number
+}
+
+/** A heading of tasks.md and the tasks under it. `title` is none for tasks before any heading. */
+export interface TaskGroup {
+  readonly title: Option.Option<string>
+  readonly progress: Progress
+  /** Holds the first unchecked task; the view expands this group by default. */
+  readonly current: boolean
+  readonly tasks: ReadonlyArray<TaskLine>
+}
 
 /** One artifact line; the tasks artifact carries its progress and task list. */
 export type ArtifactRow = Data.TaggedEnum<{
@@ -30,7 +38,7 @@ export type ArtifactRow = Data.TaggedEnum<{
     readonly id: string
     readonly mark: Mark
     readonly progress: Option.Option<Progress>
-    readonly items: ReadonlyArray<TaskItem>
+    readonly groups: ReadonlyArray<TaskGroup>
   }
 }>
 export const ArtifactRow = Data.taggedEnum<ArtifactRow>()
@@ -46,33 +54,27 @@ const markOf = {
   blocked: "blocked",
 } as const satisfies Record<ArtifactStatus, Mark>
 
-const taskItems = (doc: TaskDocument): ReadonlyArray<TaskItem> => {
+const taskGroups = (doc: TaskDocument): ReadonlyArray<TaskGroup> => {
   const firstOpen = doc.sections.flatMap((s) => s.tasks).findIndex((t) => !t.done)
-  const titled = doc.sections.length > 1 || doc.sections.some((s) => Option.isSome(s.title))
   return doc.sections.reduce(
     (acc, section) => {
-      const header: ReadonlyArray<TaskItem> = pipe(
-        section.title,
-        Option.filter(() => titled),
-        Option.map((title) =>
-          TaskItem.Section({
-            title,
-            progress: { completed: section.tasks.filter((t) => t.done).length, total: section.tasks.length },
-          }),
-        ),
-        Option.toArray,
-      )
-      const rows = section.tasks.map((task, i) =>
-        TaskItem.Task({
+      const tasks = section.tasks.map(
+        (task, i): TaskLine => ({
           label: task.label,
           depth: task.depth,
           mark: task.done ? "done" : acc.offset + i === firstOpen ? "active" : "pending",
         }),
       )
-      return { offset: acc.offset + section.tasks.length, items: [...acc.items, ...header, ...rows] }
+      const group: TaskGroup = {
+        title: section.title,
+        progress: { completed: section.tasks.filter((t) => t.done).length, total: section.tasks.length },
+        current: tasks.some((t) => t.mark === "active"),
+        tasks,
+      }
+      return { offset: acc.offset + section.tasks.length, groups: [...acc.groups, group] }
     },
-    { offset: 0, items: [] as ReadonlyArray<TaskItem> },
-  ).items
+    { offset: 0, groups: [] as ReadonlyArray<TaskGroup> },
+  ).groups
 }
 
 const tasksRow = (id: string, status: ArtifactStatus, doc: Option.Option<TaskDocument>): ArtifactRow =>
@@ -80,13 +82,13 @@ const tasksRow = (id: string, status: ArtifactStatus, doc: Option.Option<TaskDoc
     doc,
     Option.filter((d) => d.total > 0),
     Option.match({
-      onNone: () => ArtifactRow.Tasks({ id, mark: markOf[status], progress: Option.none(), items: [] }),
+      onNone: () => ArtifactRow.Tasks({ id, mark: markOf[status], progress: Option.none(), groups: [] }),
       onSome: (d) =>
         ArtifactRow.Tasks({
           id,
           mark: d.completed === d.total ? "done" : "active",
           progress: Option.some({ completed: d.completed, total: d.total }),
-          items: taskItems(d),
+          groups: taskGroups(d),
         }),
     }),
   )

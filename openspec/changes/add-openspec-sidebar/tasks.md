@@ -16,9 +16,9 @@
 
 ## 3. TUI
 
-- [ ] 3.1 `src/view.tsx`: Solid section mirroring the Todo section
-- [ ] 3.2 `src/tui.tsx`: plugin entry, runtime lifecycle, session evidence memo, slot registration
-- [ ] 3.3 Typecheck passes; README documents install via `tui.json`
+- [x] 3.1 `src/view.tsx`: Solid section mirroring the Todo section
+- [x] 3.2 `src/tui.tsx`: plugin entry, runtime lifecycle, session evidence memo, slot registration
+- [x] 3.3 Typecheck passes; README documents install via `tui.json`
 
 ## 4. Verification
 

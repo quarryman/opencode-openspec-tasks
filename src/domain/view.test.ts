@@ -1,7 +1,7 @@
 import { Option } from "effect"
 import { describe, expect, it } from "vitest"
 import { parseTasks } from "./tasks.ts"
-import { ArtifactRow, buildView, TaskItem } from "./view.ts"
+import { ArtifactRow, buildView } from "./view.ts"
 
 const artifacts = [
   { id: "proposal", status: "done" },
@@ -31,12 +31,22 @@ describe("buildView", () => {
     const tasks = tasksRowOf(buildView("c", artifacts, Option.some(parseTasks("## 1. A\n- [x] a1\n- [ ] a2\n## 2. B\n- [ ] b1\n"))))
     expect(tasks.mark).toBe("active")
     expect(tasks.progress).toEqual(Option.some({ completed: 1, total: 3 }))
-    expect(tasks.items).toEqual([
-      TaskItem.Section({ title: "1. A", progress: { completed: 1, total: 2 } }),
-      TaskItem.Task({ label: "a1", depth: 0, mark: "done" }),
-      TaskItem.Task({ label: "a2", depth: 0, mark: "active" }),
-      TaskItem.Section({ title: "2. B", progress: { completed: 0, total: 1 } }),
-      TaskItem.Task({ label: "b1", depth: 0, mark: "pending" }),
+    expect(tasks.groups).toEqual([
+      {
+        title: Option.some("1. A"),
+        progress: { completed: 1, total: 2 },
+        current: true,
+        tasks: [
+          { label: "a1", depth: 0, mark: "done" },
+          { label: "a2", depth: 0, mark: "active" },
+        ],
+      },
+      {
+        title: Option.some("2. B"),
+        progress: { completed: 0, total: 1 },
+        current: false,
+        tasks: [{ label: "b1", depth: 0, mark: "pending" }],
+      },
     ])
   })
 
@@ -50,9 +60,14 @@ describe("buildView", () => {
     expect(tasks.mark).toBe("done")
   })
 
-  it("omits section headers for a single untitled section", () => {
-    expect(tasksRowOf(buildView("c", artifacts, Option.some(parseTasks("- [ ] a\n")))).items).toEqual([
-      TaskItem.Task({ label: "a", depth: 0, mark: "active" }),
+  it("keeps tasks before any heading in an untitled group", () => {
+    expect(tasksRowOf(buildView("c", artifacts, Option.some(parseTasks("- [ ] a\n")))).groups).toEqual([
+      { title: Option.none(), progress: { completed: 0, total: 1 }, current: true, tasks: [{ label: "a", depth: 0, mark: "active" }] },
     ])
+  })
+
+  it("marks no group current when every task is done", () => {
+    const groups = tasksRowOf(buildView("c", artifacts, Option.some(parseTasks("## A\n- [x] a\n## B\n- [x] b\n")))).groups
+    expect(groups.map((g) => g.current)).toEqual([false, false])
   })
 })
