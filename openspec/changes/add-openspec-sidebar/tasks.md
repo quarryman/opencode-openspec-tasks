@@ -9,10 +9,10 @@
 ## 2. Effect services
 
 - [x] 2.1 `src/openspec/schema.ts`: Schema for `list --json` and `status --json` with realistic decode tests
-- [ ] 2.2 `src/openspec/cli.ts`: `OpenSpecCli` service over `ChildProcessSpawner`, typed errors
-- [ ] 2.3 `src/opencode/events.ts`: `OpencodeEvents` service wrapping `api.event.on` with `Stream.callback`
-- [ ] 2.4 `src/progress.ts`: per-session pipeline (resolution, status refresh, tasks refresh, debounce, switch on change)
-- [ ] 2.5 Effect tests for the pipeline with stub CLI, stub events and a temp directory
+- [x] 2.2 `src/openspec/cli.ts`: `OpenSpecCli` service over `ChildProcessSpawner`, typed errors
+- [x] 2.3 `src/opencode/events.ts`: `OpencodeEvents` service wrapping `api.event.on` with `Stream.callback`
+- [x] 2.4 `src/progress.ts`: per-session pipeline (resolution, status refresh, tasks refresh, debounce, switch on change)
+- [x] 2.5 Effect tests for the pipeline with stub CLI, stub events and a temp directory
 
 ## 3. TUI
 

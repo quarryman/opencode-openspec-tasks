@@ -10,8 +10,14 @@ export const listedChangeSchema = Schema.Struct({
 })
 export type ListedChange = typeof listedChangeSchema.Type
 
+export const openSpecRootSchema = Schema.Struct({
+  path: Schema.String,
+})
+
 export const listResponseSchema = Schema.Struct({
   changes: Schema.Array(listedChangeSchema),
+  /** The resolved OpenSpec root, which can be above the directory the command ran in. */
+  root: Schema.optional(Schema.NullOr(openSpecRootSchema)),
 })
 export type ListResponse = typeof listResponseSchema.Type
 
