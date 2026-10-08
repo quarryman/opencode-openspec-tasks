@@ -1,7 +1,7 @@
 import * as NodeFs from "node:fs"
 import * as NodeOs from "node:os"
 import * as NodePath from "node:path"
-import { NodeFileSystem } from "@effect/platform-node"
+import * as NodeFileSystem from "@effect/platform-node/NodeFileSystem"
 import { describe, expect, it } from "@effect/vitest"
 import { Duration, Effect, Fiber, FileSystem, Layer, Option, Queue, Stream, SubscriptionRef } from "effect"
 import type { TuiEventBus } from "@opencode-ai/plugin/tui"

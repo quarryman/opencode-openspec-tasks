@@ -1,7 +1,7 @@
 /** @jsxImportSource @opentui/solid */
 import type { TuiPlugin, TuiPluginApi, TuiPluginModule } from "@opencode-ai/plugin/tui"
 import type { Part } from "@opencode-ai/sdk/v2"
-import { NodeServices } from "@effect/platform-node"
+import * as NodeServices from "@effect/platform-node/NodeServices"
 import { Effect, Fiber, Layer, ManagedRuntime, Option, pipe, Stream, SubscriptionRef } from "effect"
 import { createEffect, createMemo, createRoot, createSignal, type Accessor } from "solid-js"
 import { changeFromCommand, latestEvidence } from "./domain/evidence.ts"

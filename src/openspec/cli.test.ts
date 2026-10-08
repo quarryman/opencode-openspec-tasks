@@ -1,6 +1,6 @@
 import { execFileSync } from "node:child_process"
 import * as NodeOs from "node:os"
-import { NodeServices } from "@effect/platform-node"
+import * as NodeServices from "@effect/platform-node/NodeServices"
 import { describe, expect, it } from "@effect/vitest"
 import { Effect, Layer } from "effect"
 import { OpenSpecCli } from "./cli.ts"
